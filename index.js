@@ -40,6 +40,13 @@ async function run() {
             res.send({ accessToken });
 
         })
+        //----------------- GET Oparation to load products --------------------//
+        app.get('/products', async (req, res) => {
+            const query = {};
+            const cursor = productCollection.find(query);
+            const products = await cursor.toArray();
+            res.send(products);
+        })
 
 
     }
