@@ -35,6 +35,7 @@ async function run() {
         await client.connect();
         const productCollection = client.db('finalData').collection('products');
         const reviewCollection = client.db('finalData').collection('reviews');
+        const userCollection = client.db('finalData').collection('user');
         //----------------- POST Oparation for token access --------------------//
         app.post('/signin', async (req, res) => {
             const user = req.body;
@@ -70,6 +71,12 @@ async function run() {
             const cursor = reviewCollection.find(query);
             const reviews = await cursor.toArray();
             res.send(reviews);
+        })
+        //----------------- POST Oparation for User Info --------------------//
+        app.post('/user', async (req, res) => {
+            const newUser = req.body;
+            const result = await userCollection.insertOne(newUser);
+            res.send(result);
         })
 
 
