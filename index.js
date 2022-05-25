@@ -78,6 +78,20 @@ async function run() {
             const result = await userCollection.insertOne(newUser);
             res.send(result);
         })
+        //----------------- GET oparation for user --------------------//
+        app.get('/user', jwtVerifiction, async (req, res) => {
+            const decodedEmail = req.decoded.email;
+            const email = req.query.email;
+            if (email === decodedEmail) {
+                const query = { email: email };
+                const cursor = userCollection.find(query);
+                const user = await cursor.toArray();
+                res.send(user);
+            }
+            else {
+                res.status(403).send({ message: 'your access is forbidden-(403)' })
+            }
+        })
 
 
     }
