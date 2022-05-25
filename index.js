@@ -1,6 +1,7 @@
 require('dotenv').config();
-const express = require('express')
-const app = express()
+const express = require('express');
+const app = express();
+const jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5000;
 const cors = require('cors');
 app.use(cors());
@@ -33,6 +34,7 @@ async function run() {
     try {
         await client.connect();
         const productCollection = client.db('finalData').collection('products');
+        const reviewCollection = client.db('finalData').collection('reviews');
         //----------------- POST Oparation for token access --------------------//
         app.post('/signin', async (req, res) => {
             const user = req.body;
@@ -55,6 +57,12 @@ async function run() {
             };
             const product = await productCollection.findOne(query);
             res.send(product);
+        })
+        //----------------- POST Oparation for Review --------------------//
+        app.post('/reviews', async (req, res) => {
+            const newReview = req.body;
+            const result = await reviewCollection.insertOne(newReview);
+            res.send(result);
         })
 
 
