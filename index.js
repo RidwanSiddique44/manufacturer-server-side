@@ -36,6 +36,7 @@ async function run() {
         const productCollection = client.db('finalData').collection('products');
         const reviewCollection = client.db('finalData').collection('reviews');
         const userCollection = client.db('finalData').collection('user');
+        const orderCollection = client.db('finalData').collection('order');
         //----------------- POST Oparation for token access --------------------//
         app.post('/signin', async (req, res) => {
             const user = req.body;
@@ -58,6 +59,12 @@ async function run() {
             };
             const product = await productCollection.findOne(query);
             res.send(product);
+        })
+        //----------------- POST Oparation for single products --------------------//
+        app.post('/products', async (req, res) => {
+            const newProduct = req.body;
+            const result = await productCollection.insertOne(newProduct);
+            res.send(result);
         })
         //----------------- POST Oparation for Review --------------------//
         app.post('/reviews', async (req, res) => {
@@ -91,6 +98,19 @@ async function run() {
             else {
                 res.status(403).send({ message: 'your access is forbidden-(403)' })
             }
+        })
+        //----------------- POST Oparation for Order --------------------//
+        app.post('/order', async (req, res) => {
+            const newOrder = req.body;
+            const result = await orderCollection.insertOne(newOrder);
+            res.send(result);
+        })
+
+        app.get('/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = await userCollection.findOne({ email: email });
+            const isAdmin = user.role === 'admin';
+            res.send({ admin: isAdmin })
         })
 
 
