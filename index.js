@@ -133,7 +133,7 @@ async function run() {
                 res.status(403).send({ message: 'your access is forbidden-(403)' })
             }
         })
-        //----------------- POST Oparation for Order --------------------//
+        //----------------- Oparation for Order --------------------//
         app.post('/order', async (req, res) => {
             const newOrder = req.body;
             const result = await orderCollection.insertOne(newOrder);
