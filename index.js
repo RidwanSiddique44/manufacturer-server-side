@@ -25,6 +25,8 @@ function jwtVerifiction(req, res, next) {
 }
 
 
+
+
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.m0clw.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -37,6 +39,16 @@ async function run() {
         const reviewCollection = client.db('finalData').collection('reviews');
         const userCollection = client.db('finalData').collection('user');
         const orderCollection = client.db('finalData').collection('order');
+        const verifyAdmin = async (req, res, next) => {
+            const requester = req.decoded.email;
+            const requesterAccount = await userCollection.findOne({ email: requester });
+            if (requesterAccount.role === 'admin') {
+                next();
+            }
+            else {
+                res.status(403).send({ message: 'your access is forbidden(403)' });
+            }
+        }
         //----------------- POST Oparation for token access --------------------//
         app.post('/signin', async (req, res) => {
             const user = req.body;
@@ -64,6 +76,13 @@ async function run() {
         app.post('/products', async (req, res) => {
             const newProduct = req.body;
             const result = await productCollection.insertOne(newProduct);
+            res.send(result);
+        })
+        //----------------- DELETE oparation for single products --------------------//
+        app.delete('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await productCollection.deleteOne(query);
             res.send(result);
         })
         //----------------- POST Oparation for Review --------------------//
@@ -105,12 +124,27 @@ async function run() {
             const result = await orderCollection.insertOne(newOrder);
             res.send(result);
         })
-
+        //----------------- GET Oparation for Admin --------------------//
         app.get('/admin/:email', async (req, res) => {
             const email = req.params.email;
             const user = await userCollection.findOne({ email: email });
             const isAdmin = user.role === 'admin';
             res.send({ admin: isAdmin })
+        })
+        //----------------- GET Oparation for All user --------------------//
+        app.get('/alluser', async (req, res) => {
+            const users = await userCollection.find().toArray();
+            res.send(users);
+        })
+        //----------------- Put Oparation for Admin --------------------//
+        app.put('/alluser/admin/:email', jwtVerifiction, verifyAdmin, async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+            const updateDoc = {
+                $set: { role: 'admin' },
+            };
+            const result = await userCollection.updateOne(filter, updateDoc);
+            res.send(result);
         })
 
 
