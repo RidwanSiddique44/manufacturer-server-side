@@ -124,6 +124,20 @@ async function run() {
             const result = await orderCollection.insertOne(newOrder);
             res.send(result);
         })
+
+        app.get('/order', jwtVerifiction, async (req, res) => {
+            const decodedEmail = req.decoded.email;
+            const email = req.query.email;
+            if (email === decodedEmail) {
+                const query = { email: email };
+                const cursor = orderCollection.find(query);
+                const order = await cursor.toArray();
+                res.send(order);
+            }
+            else {
+                res.status(403).send({ message: 'your access is forbidden-(403)' })
+            }
+        })
         //----------------- GET Oparation for Admin --------------------//
         app.get('/admin/:email', async (req, res) => {
             const email = req.params.email;
