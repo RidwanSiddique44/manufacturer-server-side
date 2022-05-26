@@ -195,6 +195,14 @@ async function run() {
             res.send(updatedOrder);
         })
 
+        //----------------- DELETE oparation for single products --------------------//
+        app.delete('/order/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await orderCollection.deleteOne(query);
+            res.send(result);
+        })
+
         //----------------- GET Oparation for Admin --------------------//
         app.get('/admin/:email', async (req, res) => {
             const email = req.params.email;
