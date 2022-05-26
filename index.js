@@ -138,6 +138,11 @@ async function run() {
                 res.status(403).send({ message: 'your access is forbidden-(403)' })
             }
         })
+
+        app.get('/allorder', async (req, res) => {
+            const result = await orderCollection.find().toArray();
+            res.send(result);
+        })
         //----------------- GET Oparation for Admin --------------------//
         app.get('/admin/:email', async (req, res) => {
             const email = req.params.email;
